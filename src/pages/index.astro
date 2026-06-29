@@ -9,12 +9,12 @@ const formatQuestionCount = (count: number) => `${count} ${count === 1 ? 'questi
 const description = 'Software engineering interview notes organized by topic and question.';
 ---
 
-<BaseLayout title="Interview Question Sessions" description={description}>
+<BaseLayout title="Interview Question Sessions" description={description} showSearchAction>
   <section class="hero">
     <p class="eyebrow">Interview Prep</p>
-    <h1>Question Sessions</h1>
+    <h1>Prep For Interviews</h1>
     <p class="lede">
-      Topic-organized interview notes. Start with a subtopic, then jump into the question notes.
+      Interview notes organized by topic. Start with a subtopic, then jump into the question notes.
     </p>
     <div class="stats" aria-label="Site statistics">
       <span>{subtopicCount} subtopics</span>
@@ -55,12 +55,13 @@ const description = 'Software engineering interview notes organized by topic and
 
   <script>
     const searchInput = document.querySelector('#note-search');
+    const mobileSearchInput = document.querySelector('#mobile-note-search');
     const cards = [...document.querySelectorAll('[data-note-card]')];
     const groups = [...document.querySelectorAll('[data-category-group]')];
     const emptyState = document.querySelector('[data-empty-state]');
 
-    searchInput?.addEventListener('input', () => {
-      const query = (searchInput as HTMLInputElement).value.trim().toLowerCase();
+    function applySearch(value: string) {
+      const query = value.trim().toLowerCase();
       let visibleCount = 0;
 
       for (const card of cards) {
@@ -75,6 +76,24 @@ const description = 'Software engineering interview notes organized by topic and
       }
 
       if (emptyState) (emptyState as HTMLElement).hidden = visibleCount !== 0;
+    }
+
+    function syncAndApply(source: HTMLInputElement) {
+      const target = source === searchInput ? mobileSearchInput : searchInput;
+
+      if (target instanceof HTMLInputElement) {
+        target.value = source.value;
+      }
+
+      applySearch(source.value);
+    }
+
+    searchInput?.addEventListener('input', () => {
+      if (searchInput instanceof HTMLInputElement) syncAndApply(searchInput);
+    });
+
+    mobileSearchInput?.addEventListener('input', () => {
+      if (mobileSearchInput instanceof HTMLInputElement) syncAndApply(mobileSearchInput);
     });
   </script>
 </BaseLayout>

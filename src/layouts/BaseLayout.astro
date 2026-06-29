@@ -4,7 +4,8 @@ import '@/styles/global.css';
 const {
   title,
   description = 'Software engineering interview notes organized by topic and question.',
-  image = '/favicon.svg'
+  image = '/favicon.svg',
+  showSearchAction = false
 } = Astro.props;
 const canonicalUrl = Astro.url;
 const imageUrl = new URL(image, canonicalUrl);
@@ -54,12 +55,14 @@ const imageUrl = new URL(image, canonicalUrl);
           <button type="button" data-theme-option="dark" aria-pressed="false">Dark</button>
         </div>
         <div class="mobile-header-actions">
-          <a class="mobile-icon-button" href="/#note-search" aria-label="Search" data-mobile-search>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m21 21-4.3-4.3" />
-              <circle cx="11" cy="11" r="7" />
-            </svg>
-          </a>
+          {showSearchAction && (
+            <button class="mobile-icon-button" type="button" aria-label="Search" aria-expanded="false" data-mobile-search>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m21 21-4.3-4.3" />
+                <circle cx="11" cy="11" r="7" />
+              </svg>
+            </button>
+          )}
           <button
             class="mobile-icon-button"
             type="button"
@@ -77,6 +80,12 @@ const imageUrl = new URL(image, canonicalUrl);
       </div>
     </header>
     <button class="mobile-nav-backdrop" type="button" aria-label="Close navigation" data-mobile-nav-backdrop></button>
+    {showSearchAction && (
+      <div class="mobile-search-panel" data-mobile-search-panel hidden>
+        <label class="search-label" for="mobile-note-search">Search subtopics</label>
+        <input id="mobile-note-search" type="search" placeholder="Filter by topic, subtopic, or question" autocomplete="off" data-mobile-search-input />
+      </div>
+    )}
     <main>
       <slot />
     </main>
@@ -134,7 +143,9 @@ const imageUrl = new URL(image, canonicalUrl);
         const menuButton = document.querySelector('[data-mobile-menu]');
         const backdrop = document.querySelector('[data-mobile-nav-backdrop]');
         const sidebar = document.querySelector('.docs-sidebar');
-        const searchLink = document.querySelector('[data-mobile-search]');
+        const searchButton = document.querySelector('[data-mobile-search]');
+        const searchPanel = document.querySelector('[data-mobile-search-panel]');
+        const mobileSearchInput = document.querySelector('[data-mobile-search-input]');
 
         if (!menuButton || !backdrop) return;
 
@@ -160,15 +171,31 @@ const imageUrl = new URL(image, canonicalUrl);
         document.addEventListener('keydown', (event) => {
           if (event.key === 'Escape') {
             setOpen(false);
+            closeSearch();
           }
         });
 
-        searchLink?.addEventListener('click', (event) => {
-          const searchInput = document.querySelector('#note-search');
-          if (searchInput instanceof HTMLInputElement) {
-            event.preventDefault();
-            setOpen(false);
-            searchInput.focus();
+        function closeSearch() {
+          if (searchPanel instanceof HTMLElement) {
+            searchPanel.hidden = true;
+          }
+
+          searchButton?.setAttribute('aria-expanded', 'false');
+        }
+
+        searchButton?.addEventListener('click', () => {
+          setOpen(false);
+
+          if (searchPanel instanceof HTMLElement) {
+            searchPanel.hidden = !searchPanel.hidden;
+          }
+
+          const isOpen = searchPanel instanceof HTMLElement && !searchPanel.hidden;
+          searchButton.setAttribute('aria-expanded', String(isOpen));
+
+          if (isOpen && mobileSearchInput instanceof HTMLInputElement) {
+            mobileSearchInput.focus();
+            mobileSearchInput.select();
           }
         });
       })();

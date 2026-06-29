@@ -217,6 +217,10 @@ a:hover {
   display: none;
 }
 
+.mobile-search-panel {
+  display: none;
+}
+
 main {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
@@ -697,6 +701,25 @@ input[type="search"] {
     transition: opacity 150ms ease;
   }
 
+  .mobile-search-panel {
+    position: fixed;
+    top: 58px;
+    right: 12px;
+    left: 12px;
+    z-index: 45;
+    display: grid;
+    gap: 7px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: 0 12px 30px rgb(0 0 0 / 16%);
+    padding: 12px;
+  }
+
+  .mobile-search-panel[hidden] {
+    display: none;
+  }
+
   body.mobile-nav-open {
     overflow: hidden;
   }
@@ -717,6 +740,10 @@ input[type="search"] {
 
   .hero {
     padding-top: 32px;
+  }
+
+  .toolbar {
+    display: none;
   }
 
   .category-group,
