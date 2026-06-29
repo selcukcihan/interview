@@ -1,0 +1,170 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getFolderIndexes, getNotes, getSubtopics, getSubtopicsByCategory } from '@/lib/content';
+import type { FolderIndex, QuestionNote } from '@/lib/content';
+import { renderMarkdown } from '@/lib/markdown';
+
+type RoutePage = { type: 'note'; note: QuestionNote } | { type: 'folder'; folder: FolderIndex };
+
+const subtopics = getSubtopics();
+const subtopicsByCategory = getSubtopicsByCategory();
+
+export function getStaticPaths() {
+  const notePaths = getNotes()
+    .filter((note) => !note.isSuggestedQuestions)
+    .map((note) => ({
+      params: { slug: note.slug },
+      props: { page: { type: 'note', note } }
+    }));
+
+  const folderPaths = getFolderIndexes().map((folder) => ({
+    params: { slug: folder.slug },
+    props: { page: { type: 'folder', folder } }
+  }));
+
+  return [...notePaths, ...folderPaths];
+}
+
+const { page } = Astro.props as { page: RoutePage };
+const note = page.type === 'note' ? page.note : null;
+const folderPage = page.type === 'folder' ? page.folder : undefined;
+const html = note ? renderMarkdown(note.body, note.sourcePath) : '';
+const segments = note ? note.segments : folderPage?.segments || [];
+const subtopicKey = note ? note.segments.slice(0, -1).join('/') : folderPage?.slug || '';
+const subtopic = subtopics.find((candidate) => candidate.key === subtopicKey);
+const title = note?.title || `${folderPage?.title} | Interview Question Sessions`;
+const formatQuestionCount = (count: number) => `${count} ${count === 1 ? 'question' : 'questions'}`;
+---
+
+<BaseLayout title={note ? `${note.title} | Interview Question Sessions` : title}>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-navigation" aria-label="Subtopic navigation">
+      {subtopic ? (
+        <nav class="desktop-sidebar-nav">
+          <a class:list={['sidebar-title-link', folderPage?.slug === subtopic.key && 'is-current']} href={`/${subtopic.key}/`}>
+            {subtopic.title}
+          </a>
+          {subtopic.answers.length > 0 && (
+            <>
+              <p class="sidebar-section">Questions</p>
+              {subtopic.answers.map((answer) => (
+                <a class:list={['sidebar-link', answer.slug === note?.slug && 'is-current']} href={`/${answer.slug}/`}>
+                  {answer.title}
+                </a>
+              ))}
+            </>
+          )}
+        </nav>
+      ) : folderPage && (
+        <nav class="desktop-sidebar-nav">
+          <p class="sidebar-title">{folderPage.title}</p>
+          {folderPage.childFolders.map((child) => (
+            <a class="sidebar-link" href={`/${child.slug}/`}>
+              {child.title}
+            </a>
+          ))}
+          {folderPage.pages.length > 0 && (
+            <>
+              <p class="sidebar-section">Questions</p>
+              {folderPage.pages.map((page) => (
+                <a class="sidebar-link" href={`/${page.slug}/`}>
+                  {page.title}
+                </a>
+              ))}
+            </>
+          )}
+        </nav>
+      )}
+      <nav class="mobile-navigation-tree" aria-label="Site navigation">
+        <a class="sidebar-title-link" href="/">All topics</a>
+        {[...subtopicsByCategory.entries()].map(([category, categorySubtopics]) => {
+          const categorySlug = categorySubtopics[0]?.key.split('/')[0] || '';
+          return (
+            <section class="mobile-nav-group">
+              <a class:list={['mobile-nav-category', segments[0] === categorySlug && 'is-current']} href={`/${categorySlug}/`}>
+                {category}
+              </a>
+              <div class="mobile-nav-subtopics">
+                {categorySubtopics.map((candidate) => (
+                  <a class:list={['sidebar-link', candidate.key === subtopicKey && 'is-current']} href={`/${candidate.key}/`}>
+                    {candidate.title}
+                  </a>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </nav>
+    </aside>
+
+    <article class="article-shell">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Docs</a>
+        {segments.slice(0, note ? -1 : undefined).map((segment: string, index: number, breadcrumbSegments: string[]) => (
+          <>
+            <span aria-hidden="true">/</span>
+            <a href={`/${breadcrumbSegments.slice(0, index + 1).join('/')}/`}>{segment}</a>
+          </>
+        ))}
+      </nav>
+      {note ? (
+        <>
+          <div class="markdown-body" set:html={html} />
+        </>
+      ) : folderPage && (
+        <>
+          <div class="folder-index">
+            <h1>{folderPage.title}</h1>
+            {folderPage.childFolders.length > 0 && (
+              <section>
+                <h2>Subfolders</h2>
+                <div class="subtopic-list">
+                  {folderPage.childFolders.map((child) => (
+                    <a class="subtopic-row" href={`/${child.slug}/`}>
+                      <span class="subtopic-row-main">
+                        <strong>{child.title}</strong>
+                        <small>{child.slug}</small>
+                      </span>
+                      <span class="subtopic-row-meta">{formatQuestionCount(child.answerCount)}</span>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+            {folderPage.pages.length > 0 && (
+              <section>
+                <h2>Questions</h2>
+                <div class="subtopic-list">
+                  {folderPage.pages.map((page) => (
+                    <a class="subtopic-row" href={`/${page.slug}/`}>
+                      <span class="subtopic-row-main">
+                        <strong>{page.title}</strong>
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        </>
+      )}
+    </article>
+
+    <nav class="toc-sidebar" aria-label="Page context">
+      {subtopic ? (
+        <>
+          <p class="sidebar-title">Subtopic</p>
+          <a href={`/${subtopic.key}/`}>{subtopic.title}</a>
+          <p class="sidebar-section">{formatQuestionCount(subtopic.answers.length)}</p>
+        </>
+      ) : folderPage && (
+        <>
+          <p class="sidebar-title">Folder</p>
+          <a href={`/${folderPage.slug}/`}>{folderPage.title}</a>
+          <p class="sidebar-section">{folderPage.childFolders.length} folders</p>
+          {folderPage.pages.length > 0 && <p class="sidebar-section">{formatQuestionCount(folderPage.pages.length)}</p>}
+        </>
+      )}
+    </nav>
+  </div>
+</BaseLayout>

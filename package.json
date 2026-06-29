@@ -1,0 +1,25 @@
+{
+  "name": "interview-question-sessions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/sync-content.mjs",
+    "clean": "node -e \"import('node:fs').then(({ rmSync }) => rmSync('dist', { recursive: true, force: true }))\"",
+    "predev": "npm run sync",
+    "dev": "astro dev",
+    "prebuild": "npm run sync",
+    "build": "npm run clean && astro check && astro build",
+    "preview": "astro preview",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^7.0.3",
+    "marked": "^15.0.0",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^5.6.0",
+    "wrangler": "^4.0.0"
+  }
+}

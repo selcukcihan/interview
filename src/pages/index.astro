@@ -1,0 +1,79 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getNotes, getSubtopicsByCategory } from '@/lib/content';
+
+const categories = getSubtopicsByCategory();
+const questionCount = getNotes().filter((note) => !note.isSuggestedQuestions).length;
+const subtopicCount = [...categories.values()].reduce((total, subtopics) => total + subtopics.length, 0);
+const formatQuestionCount = (count: number) => `${count} ${count === 1 ? 'question' : 'questions'}`;
+---
+
+<BaseLayout title="Interview Question Sessions">
+  <section class="hero">
+    <p class="eyebrow">Interview Prep</p>
+    <h1>Question Sessions</h1>
+    <p class="lede">
+      Topic-organized interview notes. Start with a subtopic, then jump into the question notes.
+    </p>
+    <div class="stats" aria-label="Site statistics">
+      <span>{subtopicCount} subtopics</span>
+      <span>{formatQuestionCount(questionCount)}</span>
+    </div>
+  </section>
+
+  <section class="toolbar" aria-label="Filter subtopics">
+    <label class="search-label" for="note-search">Search subtopics</label>
+    <input id="note-search" type="search" placeholder="Filter by topic, subtopic, or question" autocomplete="off" />
+  </section>
+
+  <section class="note-index" data-note-index>
+    {[...categories.entries()].map(([category, subtopics]) => (
+      <section class="category-group" data-category-group>
+        <h2>{category}</h2>
+        <div class="subtopic-list">
+          {subtopics.map((subtopic) => (
+            <a
+              class="subtopic-row"
+              href={`/${subtopic.key}/`}
+              data-note-card
+              data-search={`${subtopic.title} ${subtopic.category} ${subtopic.pathLabel} ${subtopic.answers.map((answer) => answer.title).join(' ')}`.toLowerCase()}
+            >
+              <span class="subtopic-row-main">
+                <strong>{subtopic.title}</strong>
+                <small>{subtopic.pathLabel}</small>
+              </span>
+              <span class="subtopic-row-meta">{formatQuestionCount(subtopic.answers.length)}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </section>
+
+  <p class="empty-state" data-empty-state hidden>No matching subtopics.</p>
+
+  <script>
+    const searchInput = document.querySelector('#note-search');
+    const cards = [...document.querySelectorAll('[data-note-card]')];
+    const groups = [...document.querySelectorAll('[data-category-group]')];
+    const emptyState = document.querySelector('[data-empty-state]');
+
+    searchInput?.addEventListener('input', () => {
+      const query = (searchInput as HTMLInputElement).value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      for (const card of cards) {
+        const matches = !query || card.getAttribute('data-search')?.includes(query);
+        card.toggleAttribute('hidden', !matches);
+        if (matches) visibleCount += 1;
+      }
+
+      for (const group of groups) {
+        const hasVisibleCards = [...group.querySelectorAll('[data-note-card]')].some((card) => !card.hasAttribute('hidden'));
+        group.toggleAttribute('hidden', !hasVisibleCards);
+      }
+
+      if (emptyState) (emptyState as HTMLElement).hidden = visibleCount !== 0;
+    });
+  </script>
+</BaseLayout>

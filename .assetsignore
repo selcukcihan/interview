@@ -1,0 +1,8 @@
+node_modules/
+.git/
+.astro/
+content/
+scripts/
+src/
+*.md
+*.map
