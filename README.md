@@ -1,29 +1,59 @@
-# Interview Question Sessions Website
+# Interview
 
-Astro site for publishing generated interview-prep question sessions from the parent notes vault.
+Interview is a public collection of software engineering interview notes, organized as question-focused study pages.
 
-## Workflow
+The site is built for quick review: pick a topic, browse the questions in that area, and open the notes that explain the answer in practical terms. The current collection covers systems and backend topics such as Linux, containers, Kubernetes, networking, WebSockets, security, PostgreSQL, and database internals.
+
+## Website
+
+The project is an Astro static site styled as a compact documentation site. It includes:
+
+- Topic and subtopic index pages
+- Markdown-based question notes
+- Light, dark, and auto theme modes
+- Mobile navigation with a full topic drawer
+- Search across topics and question titles
+
+## Local Development
+
+Install dependencies:
 
 ```bash
 npm install
-npm run sync
+```
+
+Start the local development server:
+
+```bash
 npm run dev
+```
+
+Build the site:
+
+```bash
 npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+## Deployment
+
+The site is configured for Cloudflare Workers static assets through `wrangler.jsonc`.
+
+Deploy with:
+
+```bash
 npm run deploy
 ```
 
-`npm run sync` copies generated Markdown from the parent `question_sessions/` folder into `content/question_sessions/`.
+## Content
 
-The sync intentionally excludes:
+The published pages are generated from Markdown notes and cleaned during the build workflow so the website only contains reader-facing material.
 
-- `website/`
-- `index.generated.md`
-- `prompts.generated.md`
+## License
 
-The sync also strips `Chat Log` sections from the copied Markdown. The original notes keep their full chat history; only the publishable copy is cleaned.
-
-## Publishing
-
-This folder is intended to be its own Git repository. Keep the parent notes vault private and push only this `website/` repository to GitHub.
-
-Cloudflare Workers deployment uses `wrangler.jsonc` and serves the static Astro build from `dist/`.
+Copyright © Selçuk Cihan. All rights reserved.
