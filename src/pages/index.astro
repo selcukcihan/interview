@@ -6,9 +6,10 @@ const categories = getSubtopicsByCategory();
 const questionCount = getNotes().filter((note) => !note.isSuggestedQuestions).length;
 const subtopicCount = [...categories.values()].reduce((total, subtopics) => total + subtopics.length, 0);
 const formatQuestionCount = (count: number) => `${count} ${count === 1 ? 'question' : 'questions'}`;
+const description = 'Software engineering interview notes organized by topic and question.';
 ---
 
-<BaseLayout title="Interview Question Sessions">
+<BaseLayout title="Interview Question Sessions" description={description}>
   <section class="hero">
     <p class="eyebrow">Interview Prep</p>
     <h1>Question Sessions</h1>

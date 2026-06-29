@@ -1,7 +1,13 @@
 ---
 import '@/styles/global.css';
 
-const { title, description = 'Generated interview-prep question sessions.' } = Astro.props;
+const {
+  title,
+  description = 'Software engineering interview notes organized by topic and question.',
+  image = '/favicon.svg'
+} = Astro.props;
+const canonicalUrl = Astro.url;
+const imageUrl = new URL(image, canonicalUrl);
 ---
 
 <!doctype html>
@@ -10,6 +16,17 @@ const { title, description = 'Generated interview-prep question sessions.' } = A
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:site_name" content="Interview" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl.href} />
+    <meta property="og:image" content={imageUrl.href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl.href} />
     <title>{title}</title>
     <script is:inline>
       (() => {
