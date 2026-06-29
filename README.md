@@ -1,5 +1,7 @@
 # Interview
 
+![Interview social card](public/social-card.png)
+
 Interview is a public collection of software engineering interview notes, organized as question-focused study pages.
 
 The site is built for quick review: pick a topic, browse the questions in that area, and open the notes that explain the answer in practical terms. The current collection covers systems and backend topics such as Linux, containers, Kubernetes, networking, WebSockets, security, PostgreSQL, and database internals.
