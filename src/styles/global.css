@@ -415,10 +415,6 @@ input[type="search"] {
   padding-left: 18px;
 }
 
-.mobile-navigation-tree {
-  display: none;
-}
-
 .sidebar-title {
   margin: 0 0 10px;
   color: var(--text);
@@ -479,11 +475,11 @@ input[type="search"] {
   font-weight: 650;
 }
 
-.mobile-nav-group {
+.nav-tree-group {
   margin-top: 18px;
 }
 
-.mobile-nav-category {
+.nav-tree-category {
   display: block;
   border-radius: 6px;
   color: var(--text);
@@ -493,16 +489,16 @@ input[type="search"] {
   text-decoration: none;
 }
 
-.mobile-nav-category:hover {
+.nav-tree-category:hover {
   background: var(--surface-subtle);
   text-decoration: none;
 }
 
-.mobile-nav-category.is-current {
+.nav-tree-category.is-current {
   color: var(--accent-strong);
 }
 
-.mobile-nav-subtopics {
+.nav-tree-subtopics {
   display: grid;
   gap: 1px;
   margin-top: 4px;
@@ -766,14 +762,6 @@ input[type="search"] {
     transform: translateX(-100%);
     transition: transform 150ms ease, visibility 150ms ease;
     visibility: hidden;
-  }
-
-  .desktop-sidebar-nav {
-    display: none;
-  }
-
-  .mobile-navigation-tree {
-    display: block;
   }
 
   body.mobile-nav-open .docs-sidebar {

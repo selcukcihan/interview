@@ -62,52 +62,16 @@ const description = note
 <BaseLayout title={note ? `${note.title} | Interview Question Sessions` : title} description={description}>
   <div class="docs-shell">
     <aside class="docs-sidebar" id="docs-navigation" aria-label="Subtopic navigation">
-      {subtopic ? (
-        <nav class="desktop-sidebar-nav">
-          <a class:list={['sidebar-title-link', folderPage?.slug === subtopic.key && 'is-current']} href={`/${subtopic.key}/`}>
-            {subtopic.title}
-          </a>
-          {subtopic.answers.length > 0 && (
-            <>
-              <p class="sidebar-section">Questions</p>
-              {subtopic.answers.map((answer) => (
-                <a class:list={['sidebar-link', answer.slug === note?.slug && 'is-current']} href={`/${answer.slug}/`}>
-                  {answer.title}
-                </a>
-              ))}
-            </>
-          )}
-        </nav>
-      ) : folderPage && (
-        <nav class="desktop-sidebar-nav">
-          <p class="sidebar-title">{folderPage.title}</p>
-          {folderPage.childFolders.map((child) => (
-            <a class="sidebar-link" href={`/${child.slug}/`}>
-              {child.title}
-            </a>
-          ))}
-          {folderPage.pages.length > 0 && (
-            <>
-              <p class="sidebar-section">Questions</p>
-              {folderPage.pages.map((page) => (
-                <a class="sidebar-link" href={`/${page.slug}/`}>
-                  {page.title}
-                </a>
-              ))}
-            </>
-          )}
-        </nav>
-      )}
-      <nav class="mobile-navigation-tree" aria-label="Site navigation">
+      <nav class="navigation-tree" aria-label="Site navigation">
         <a class="sidebar-title-link" href="/">All topics</a>
         {[...subtopicsByCategory.entries()].map(([category, categorySubtopics]) => {
           const categorySlug = categorySubtopics[0]?.key.split('/')[0] || '';
           return (
-            <section class="mobile-nav-group">
-              <a class:list={['mobile-nav-category', segments[0] === categorySlug && 'is-current']} href={`/${categorySlug}/`}>
+            <section class="nav-tree-group">
+              <a class:list={['nav-tree-category', segments[0] === categorySlug && 'is-current']} href={`/${categorySlug}/`}>
                 {category}
               </a>
-              <div class="mobile-nav-subtopics">
+              <div class="nav-tree-subtopics">
                 {categorySubtopics.map((candidate) => (
                   <a class:list={['sidebar-link', candidate.key === subtopicKey && 'is-current']} href={`/${candidate.key}/`}>
                     {candidate.title}

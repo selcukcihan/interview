@@ -522,6 +522,73 @@ It may be associated with a user account, but it is not the same as an interacti
 - How do API key rotation and revocation work?
 - What is JWKS and how does JWT signature verification work?
 
+## Follow-Up: For Sign In With Google, Do I Use OAuth Or OIDC?
+
+Use **OpenID Connect**, usually abbreviated OIDC.
+
+More precisely:
+
+```text
+Sign in with Google uses an OIDC login flow built on top of OAuth 2.0.
+```
+
+OAuth 2.0 by itself is mainly about delegated authorization:
+
+```text
+Allow this app to access my Google Calendar.
+Allow this app to read my GitHub repositories.
+Allow this app to post to my Slack workspace.
+```
+
+OIDC is about authentication and identity:
+
+```text
+Sign me in with my Google account.
+Tell this application who authenticated.
+Give this application a stable subject identifier for the user.
+```
+
+When building a new app with "Sign in with Google", the app usually wants identity information:
+
+```text
+Google authenticated this user.
+Their stable Google subject ID is ...
+Their email is ...
+Their email is verified ...
+Their name/profile picture may be ...
+```
+
+That identity information comes from OIDC, especially:
+
+- the **ID token**;
+- sometimes the OIDC `userinfo` endpoint.
+
+The mechanics still look like OAuth:
+
+```text
+1. User clicks "Sign in with Google".
+2. App redirects the user to Google's authorization server.
+3. User authenticates at Google.
+4. Google redirects back to the app with an authorization code.
+5. App exchanges the code for tokens.
+6. App receives an ID token and often an access token.
+7. App validates the ID token.
+8. App creates or links a local user account.
+9. App creates its own session for the user.
+```
+
+The most important token for login is:
+
+```text
+ID token = proof to your app that Google authenticated the user
+```
+
+A precise way to say it:
+
+> We use OpenID Connect with Google as the identity provider, using the OAuth 2.0 Authorization Code flow.
+
+In practice, provider dashboards and docs often say "OAuth" even when the login feature is OIDC, because OIDC is layered on OAuth 2.0. For sign-up/sign-in, the conceptually correct answer is OIDC.
+
 ## Sources
 
 - [OAuth 2.0 Framework: RFC 6749](https://www.rfc-editor.org/rfc/rfc6749)
